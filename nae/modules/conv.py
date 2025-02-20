@@ -208,7 +208,7 @@ class SConv1d(nn.Module):
         pad_mode: str = "reflect",
     ):
         super().__init__()
-        # ward user between stride and dilation setup
+        # warn user between stride and dilation setup
         if stride > 1 and dilation > 1:
             warnings.warn(
                 "SConv1d has been initialized with stride > 1 and dilation > 1"
@@ -245,6 +245,7 @@ class SConv1d(nn.Module):
             # left padding for causal
             x = pad1d(x, (padding_total, extra_padding), self.pad_mode)
         else:
+            # asymmetric paddings required for odd strides
             padding_right = padding_total // 2
             padding_left = padding_total - padding_right
             x = pad1d(x, (padding_left, padding_right + extra_padding), self.pad_mode)
@@ -283,11 +284,17 @@ class SConvTranspose1d(nn.Module):
 
         x = self.convtr(x)
 
+        # We will only trim the fixed padding. Extra padding from `pad_for_conv1d`
+        # will only to be removed at the very end, when keeping only the right length for the output.
+        # As removing it here would required to pass the length at the matching layer in the encoder.
         if self.causal:
+            # Trim the padding on the right according the specified ratio,
+            # if trim_right_ratio is 1.0, trim everything from the right.
             padding_right = math.ceil(padding_total * self.trim_right_ratio)
             padding_left = padding_total - padding_right
             x = unpad1d(x, (padding_left, padding_right))
         else:
+            # asymmetric paddings required for odd strides
             padding_right = padding_total // 2
             padding_left = padding_total - padding_right
             x = unpad1d(x, (padding_left, padding_right))
