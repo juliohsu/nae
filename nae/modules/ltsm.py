@@ -3,7 +3,7 @@
 import torch.nn as nn
 
 
-class LTSM(nn.Module):
+class SLTSM(nn.Module):
     """LTSM without worrying about hidden state, nor the input data, but expects input as convolutional layout."""
 
     def __init__(self, dimension: int, n_layers: int = 2, skip: bool = True):

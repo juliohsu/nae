@@ -5,7 +5,8 @@ import typing as tp
 import numpy as np
 import torch.nn as nn
 
-from . import SConv1d, SConvTranspose1d, SLTSM
+from .conv import SConv1d, SConvTranspose1d
+from .ltsm import SLTSM
 
 
 class SEANetResnetBlock(nn.Module):
